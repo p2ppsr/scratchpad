@@ -9,7 +9,9 @@ import {
   IconButton,
   Button,
   Typography,
-  Divider
+  Divider,
+  Checkbox,
+  FormControlLabel
 } from '@material-ui/core'
 import { ToastContainer, toast } from 'react-toastify'
 import { PaymentModal, requestPayment } from '@cwi/payment-modal'
@@ -29,6 +31,9 @@ export default () => {
   const [address, setAddress] = useState('')
   const [txData, setTxData] = useState([])
   const [resultTXID, setResultTXID] = useState('')
+  const [rPuzzleEnabled, setRPuzzleEnabled] = useState(false)
+  const [rPuzzleTX, setRPuzzleTX] = useState('')
+  const [rPuzzleK, setRPuzzleK] = useState('')
 
   const broadcast = async e => {
     e.preventDefault()
@@ -38,6 +43,10 @@ export default () => {
         wif: privateKey,
         data: parsedData,
         calculateRequiredFundsDryRun: true,
+        rpuzzle: rPuzzleEnabled ? {
+          k: rPuzzleK,
+          tx: rPuzzleTX
+        } : undefined,
         additionalOutputs: {
           '1KcqKANgwbqFLYvgwGieKtuRmkpUvEYLSf': 5000
         }
@@ -58,15 +67,26 @@ export default () => {
             onAbort: reject
           })
         })
-        await new Promise(resolve => setTimeout(resolve, 3000))
+        let newBalance, requestCount
+        do {
+          const newResult = await boomerang(
+            'GET',
+            `https://api.whatsonchain.com/v1/bsv/main/address/${address}/balance`
+          )
+          newBalance = newResult.confirmed + newResult.unconfirmed
+          await new Promise(resolve => setTimeout(resolve, 750))
+          requestCount++
+        } while (newBalance < requiredFunds && requestCount < 20)
       }
-      setResultTXID(await remembrance({
+      const txid = await remembrance({
         wif: privateKey,
         data: parsedData,
         additionalOutputs: {
           '1KcqKANgwbqFLYvgwGieKtuRmkpUvEYLSf': 5000
         }
-      }))
+      })
+      setResultTXID(txid)
+      alert('Broadcasted! TXID: ' + txid)
     } catch (e) {
       toast.error(e.message)
     }
@@ -150,11 +170,40 @@ export default () => {
           <Casino color='primary' />
         </IconButton>
       </div>
+      <div className={classes.rpuzzle_grid}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={rPuzzleEnabled}
+              onChange={e => setRPuzzleEnabled(e.target.checked)}
+            />
+          }
+          label='Spend an R Puzzle'
+        />
+        {rPuzzleEnabled && (
+          <div className={classes.rpuzzle_fields}>
+            <TextField
+              fullWidth
+              variant='outlined'
+              label='K value (hex)'
+              value={rPuzzleK}
+              onChange={e => setRPuzzleK(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              variant='outlined'
+              label='Spending Transaction (hex)'
+              value={rPuzzleTX}
+              onChange={e => setRPuzzleTX(e.target.value)}
+            />
+          </div>
+        )}
+      </div>
       <Typography variant='h5'>Data Fields</Typography>
       <Typography paragraph>
         Compose your data transaction by adding OP_RETURN fields.
       </Typography>
-      <div cclassName={classes.fields}>
+      <div className={classes.fields}>
         {txData.map((d, i) => (
           <>
             <div className={classes.field}>
@@ -200,7 +249,9 @@ export default () => {
         >
           Broadcast
         </Button>
-        <Typography>{resultTXID}</Typography>
+        {resultTXID && (
+          <Typography>Success! TXID: {resultTXID}</Typography>
+        )}
       </center>
     </form>
   )

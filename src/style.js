@@ -3,10 +3,18 @@ export default theme => ({
     maxWidth: '1440px',
     margin: '2em auto'
   },
+  rpuzzle_grid: {
+    marginBottom: theme.spacing(3)
+  },
   privkey_grid: {
     display: 'grid',
     gridTemplateColumns: '1fr auto',
     marginBottom: theme.spacing(2)
+  },
+  rpuzzle_fields: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gridGap: theme.spacing(2)
   },
   fields: {
     display: 'grid',

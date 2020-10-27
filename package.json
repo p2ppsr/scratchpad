@@ -5,12 +5,12 @@
   "dependencies": {
     "@cwi/boomerang": "^0.1.0",
     "@cwi/payment-modal": "^0.1.1",
-    "@cwi/remembrance": "^0.1.0",
+    "@cwi/remembrance": "^0.1.1",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
-    "bsv": "^1.5.3",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "bsv": "1.5.4",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-scripts": "3.4.3",
     "react-toastify": "^6.0.9"
   },
