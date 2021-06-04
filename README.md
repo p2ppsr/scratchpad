@@ -1,6 +1,6 @@
 # Scratchpad
 
-Transaction broadcaster
+Bitcoin SV Transaction Studio
 
 ## Confidentiality
 
