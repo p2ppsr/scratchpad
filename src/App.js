@@ -14,7 +14,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
 import { makeStyles } from '@material-ui/core/styles'
-import { Casino, Delete } from '@material-ui/icons'
+import { Casino, Delete, Send } from '@material-ui/icons'
 import { createAction } from '@babbage/sdk'
 
 const useStyles = makeStyles(style, {
@@ -27,10 +27,12 @@ export default () => {
   const [address, setAddress] = useState('')
   const [txData, setTxData] = useState([])
   const [resultTXID, setResultTXID] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const broadcast = async e => {
     e.preventDefault()
     try {
+      setLoading(true)
       const parsedData = parseTransactionData()
       const action = await createAction({
         description: 'Send a transaction with Scratchpad Studio',
@@ -41,13 +43,20 @@ export default () => {
       toast.dark('Broadcasted! TXID: ' + action.txid)
     } catch (e) {
       toast.error(e.message)
+    } finally {
+      setLoading(false)
     }
   }
 
   const parseTransactionData = () => {
+    if (!txData.length) {
+      throw new Error(
+        'Specify at least one OP_RETURN field in your data output!'
+      )
+    }
     return txData.map(el => {
       if (el.type === 'utf8') {
-        return el.data
+        return btoa(el.data)
       } else { // hex
         return Uint8Array.from(Buffer.from(el.data, 'hex'))
       }
@@ -168,6 +177,8 @@ export default () => {
           color='primary'
           size='large'
           type='submit'
+          disabled={loading}
+          startIcon={<Send />}
         >
           Broadcast
         </Button>
