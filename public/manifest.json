@@ -15,6 +15,7 @@
   "babbage": {
     "commission": {
       "address": "1KcqKANgwbqFLYvgwGieKtuRmkpUvEYLSf",
+      "paymail": "p2ppsr@tyweb.us",
       "frequency": 1,
       "amount": 5000
     }
