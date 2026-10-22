@@ -15,3 +15,7 @@ Application dependency versions and public client compatibility are unchanged.
 The obsolete Cloud Run workflow is retained only as a non-executable reference
 at `docs/legacy-cloud-run-deploy.yaml.txt`; this update does not restore a legacy
 service or publish a browser bundle.
+
+The frozen Webpack4 build needs OpenSSL legacy hashing for cache identifiers.
+CI scopes `--openssl-legacy-provider` to the bundle-build step only; deployed
+services receive no runtime option or cryptographic-contract change.

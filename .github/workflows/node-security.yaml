@@ -19,4 +19,8 @@ jobs:
       - name: Install frozen historical dependency graph
         run: npm ci --legacy-peer-deps
       - name: Build retained source
+        # Webpack4 uses MD4 for build-cache identifiers. Scope compatibility to
+        # this offline bundle build; no deployed Node runtime receives the flag.
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
         run: npm run build
